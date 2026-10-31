@@ -1,0 +1,42 @@
+name: 'Zerify Horizontal Line CAPTCHA'
+description: 'Inject a draw-a-horizontal-line human verification into static HTML pages'
+author: 'Zhischooler'
+
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  path:
+    description: 'Directory containing the built HTML site'
+    required: false
+    default: '.'
+  form-selector:
+    description: 'CSS selector of forms to protect; empty means all <form>'
+    required: false
+    default: ''
+  exclude:
+    description: 'Comma-separated glob patterns to skip, e.g. "admin/*,preview.html"'
+    required: false
+    default: ''
+  dry-run:
+    description: 'Only print which files would be modified'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Inject Zerify
+      shell: bash
+      env:
+        ZERIFY_PATH: ${{ inputs.path }}
+        ZERIFY_FORM_SELECTOR: ${{ inputs.form-selector }}
+        ZERIFY_EXCLUDE: ${{ inputs.exclude }}
+        ZERIFY_DRY_RUN: ${{ inputs.dry-run }}
+      run: node "${{ github.action_path }}/inject.js"
