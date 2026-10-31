@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Dry run on fixture
+        run: |
+          ZERIFY_PATH=./test-site ZERIFY_FORM_SELECTOR='' ZERIFY_DRY_RUN=true node inject.js
+          test -n "$(ZERIFY_PATH=./test-site ZERIFY_DRY_RUN=true node inject.js | grep 'would inject')"
+
+      - name: Real inject on copy
+        run: |
+          rm -rf test-out
+          cp -r test-site test-out
+          ZERIFY_PATH=./test-out ZERIFY_FORM_SELECTOR='' node inject.js
+          grep -q 'data-zerify-injected' test-out/index.html
+
+      - name: Idempotent re-run
+        run: |
+          before=$(md5sum test-out/index.html | cut -d' ' -f1)
+          ZERIFY_PATH=./test-out node inject.js
+          after=$(md5sum test-out/index.html | cut -d' ' -f1)
+          test "$before" = "$after"
