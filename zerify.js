@@ -383,7 +383,7 @@
     var dy = end.y - start.y;
 
     if (Math.abs(dx) < usable * o.minLengthRatio) return this._fail('线条长度不足');
-    if (Math.abs(dy) > h * o.maxSlopeRatio) return this._fail('线条不够水平');
+    if (Math.abs(dy) > h * o.maxSlopeRatio) return this._fail('线条不够目标水平');
 
     var dir = dx >= 0 ? 1 : -1;
     var backtracks = 0;
