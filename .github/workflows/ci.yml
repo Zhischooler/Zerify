@@ -33,3 +33,5 @@ jobs:
           ZERIFY_PATH=./test-out node inject.js
           after=$(md5sum test-out/index.html | cut -d' ' -f1)
           test "$before" = "$after"
+- name: Verify dist contents
+  run: ls -la dist/ && test -f dist/index.html
